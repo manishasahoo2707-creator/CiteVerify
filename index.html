@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CiteVerify — Verify Your Research. Trust Your Citations.</title>
+  <style>
+    :root {
+      --bg-dark: #070919;
+      --bg-mid: #0c1029;
+      --panel: #111636;
+      --panel-2: #171e47;
+      --sidebar-bg: #090c21;
+      --border: rgba(139, 92, 246, 0.24);
+      --border-bright: rgba(99, 102, 241, 0.55);
+      --text: #f3f6ff;
+      --muted: #a5b0d6;
+      --cyan: #22d3ee;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 65% 15%, #1e1b4b 0%, var(--bg-mid) 45%, var(--bg-dark) 100%);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+    }
+    aside {
+      width: 238px;
+      background: linear-gradient(180deg, #0b0e26 0%, var(--sidebar-bg) 100%);
+      border-right: 1px solid var(--border);
+      padding: 16px 12px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 8px 16px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+      margin-bottom: 10px;
+    }
+    .logo-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 1rem;
+      color: #fff;
+    }
+    .logo-title { font-weight: 800; font-size: 1rem; color: #fff; }
+    .logo-sub { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+    .sec-head {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #7c87b2;
+      padding: 10px 10px 5px;
+    }
+    .side-btn {
+      width: 100%;
+      background: transparent;
+      color: #cbd5e1;
+      border: none;
+      border-radius: 9px;
+      padding: 8px 10px;
+      font-size: 0.8rem;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 2px;
+    }
+    .side-btn:hover { background: rgba(124, 58, 237, 0.14); color: #fff; }
+    .side-btn.active {
+      background: linear-gradient(90deg, #6366f1, #7c3aed);
+      color: #fff;
+      font-weight: 600;
+    }
+    .footer-card {
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 10px;
+      font-size: 0.74rem;
+      color: #dbeafe;
+      font-weight: 600;
+    }
+    .main-col { flex: 1; padding: 14px 22px 44px; min-width: 0; }
+    .top-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .search-box {
+      flex: 1;
+      max-width: 440px;
+      background: rgba(23, 30, 71, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+    .search-box input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      width: 100%;
+      font-size: 0.82rem;
+    }
+    .header-actions { display: flex; align-items: center; gap: 10px; }
+    .pill-cta {
+      background: linear-gradient(90deg, #6366f1, #8b5cf6);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .user-chip {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 12px 5px 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #4f46e5;
+      display: grid;
+      place-items: center;
+      font-size: 0.74rem;
+      font-weight: 800;
+    }
+    .hero-card {
+      background: linear-gradient(125deg, #12173a 0%, #1b1d52 48%, #261b5c 100%);
+      border: 1px solid var(--border-bright);
+      border-radius: 16px;
+      padding: 22px 24px;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 900px) { .hero-card { grid-template-columns: 1fr; } }
+    .hero-card h1 { margin: 0; font-size: 1.9rem; font-weight: 800; color: #fff; }
+    .hero-card h2 { margin: 4px 0 8px; font-size: 1.25rem; font-weight: 700; color: #e2e8f0; }
+    .hero-card p { margin: 0 0 14px; font-size: 0.84rem; color: var(--muted); max-width: 470px; }
+    .hero-btns { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .btn-grad {
+      background: linear-gradient(90deg, #6366f1, #8b5cf6);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 15px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-grad:disabled, .btn-dark:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .btn-dark {
+      background: rgba(15, 23, 42, 0.75);
+      color: #e2e8f0;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 8px;
+      padding: 9px 15px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .hero-art { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .float-pill {
+      background: rgba(17, 22, 54, 0.92);
+      border: 1px solid rgba(129, 140, 248, 0.45);
+      color: #e0e7ff;
+      padding: 6px 13px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .stats-5 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 1050px) { .stats-5 { grid-template-columns: repeat(2, 1fr); } }
+    .stat-card {
+      background: linear-gradient(145deg, rgba(23, 30, 71, 0.92), rgba(16, 21, 51, 0.95));
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+    .stat-top { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--muted); }
+    .stat-val { font-size: 1.35rem; font-weight: 800; color: #fff; margin: 6px 0 2px; }
+    .stat-lbl { font-size: 0.73rem; color: var(--muted); }
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 960px) { .bottom-grid { grid-template-columns: 1fr; } }
+    .card-box {
+      background: rgba(17, 22, 54, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+    }
+    .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .card-head h3 { margin: 0; font-size: 0.95rem; font-weight: 700; color: #fff; }
+    .link-sm { color: var(--cyan); font-size: 0.76rem; font-weight: 600; cursor: pointer; background: none; border: none; }
+    .donut-wrap { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .legend-row { display: flex; justify-content: space-between; gap: 18px; font-size: 0.8rem; margin-bottom: 8px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 7px; }
+    .report-row {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .report-row strong { display: block; font-size: 0.82rem; color: #fff; }
+    .report-row small { color: var(--muted); font-size: 0.72rem; }
+    .done-pill {
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    label { display: block; font-size: 0.78rem; color: var(--muted); margin: 10px 0 5px; font-weight: 600; }
+    input[type="text"], textarea, input[type="file"] {
+      width: 100%;
+      background: var(--panel-2);
+      color: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 11px;
+      font-size: 0.84rem;
+      font-family: inherit;
+    }
+    textarea { min-height: 82px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 8px; }
+    th, td { border-bottom: 1px solid rgba(148, 163, 184, 0.14); padding: 8px 6px; text-align: left; }
+    th { color: var(--muted); font-size: 0.7rem; text-transform: uppercase; }
+    .hl { padding: 2px 6px; border-radius: 5px; margin: 2px; display: inline-block; font-size: 0.8rem; }
+    .hl-support { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+    .hl-contradict_or_flag { background: rgba(244, 63, 94, 0.22); color: #fda4af; }
+    .hl-context { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <aside>
+    <div>
+      <div class="logo-wrap">
+        <div class="logo-badge">✓</div>
+        <div>
+          <div class="logo-title">CiteVerify</div>
+          <div class="logo-sub">Verify • Analyze • Trust</div>
+        </div>
+      </div>
+
+      <button class="side-btn active" type="button" data-nav="dashboard" data-view="dashboard">🏠 Dashboard</button>
+      <button class="side-btn" type="button" data-nav="verifier" data-view="verifier">⚡ Instant Claim Verifier</button>
+      <button class="side-btn" type="button" data-nav="upload" data-view="verifier">☁️ Upload Research Paper</button>
+      <button class="side-btn" type="button" data-nav="multi" data-view="history">📑 Multiple Paper Verification</button>
+
+      <div class="sec-head">Scientific Intelligence</div>
+      <button class="side-btn" type="button" data-nav="conflicts" data-view="conflicts">⚖️ Conflicting Research Detector</button>
+      <button class="side-btn" type="button" data-nav="strength" data-view="strength">🛡️ Source Reliability Checker</button>
+      <button class="side-btn" type="button" data-nav="network" data-view="network">📊 Research Comparison</button>
+
+      <div class="sec-head">More Features</div>
+      <button class="side-btn" type="button" data-nav="highlighter" data-view="highlighter">✨ Research Simplifier &amp; Highlights</button>
+      <button class="side-btn" type="button" data-nav="retractions" data-view="retractions">🧾 Citation &amp; Retraction Audit</button>
+      <button class="side-btn" type="button" data-nav="history" data-view="history">🕒 Verification History</button>
+    </div>
+
+    <div class="footer-card">
+      🎓 Smarter Research.<br/>Greater Confidence.
+    </div>
+  </aside>
+
+  <div class="main-col">
+    <div class="top-header">
+      <div class="search-box">
+        <span>🔍</span>
+        <input id="topSearch" type="text" placeholder="Search for claims, papers or insights..." onkeydown="if(event.key==='Enter') runFromSearch()" />
+      </div>
+      <div class="header-actions">
+        <button class="pill-cta" type="button" onclick="openView('verifier', 'verifier')">✨ Get Started</button>
+        <span style="color:var(--muted); font-size:0.9rem;">🔔</span>
+        <div class="user-chip"><span class="avatar">L</span><span>Lakshmi ⌄</span></div>
+      </div>
+    </div>
+
+    <div class="hero-card">
+      <div>
+        <h1>CiteVerify</h1>
+        <h2>Verify Your Research. Trust Your Citations.</h2>
+        <p>An intelligent research verification platform that checks scientific claims, evaluates source reliability and identifies conflicting research evidence.</p>
+        <div class="hero-btns">
+          <button class="btn-grad" type="button" onclick="openView('verifier', 'verifier')">▶ Get Started Free</button>
+          <button class="btn-dark" type="button" id="tryDemoBtn" onclick="runAudit(true)">⚡ Try Demo</button>
+          <span id="statusBanner" style="font-size:0.78rem; color:#67e8f9; font-weight:600;">Ready</span>
+        </div>
+      </div>
+      <div class="hero-art">
+        <div class="float-pill">✓ Verify Claims</div>
+        <div class="float-pill">⚖️ Detect Conflicts</div>
+        <div class="float-pill">🔍 Check Sources</div>
+      </div>
+    </div>
+
+    <div class="stats-5">
+      <div class="stat-card">
+        <div class="stat-top"><span>📄</span><span style="color:#34d399;">↑ 12%</span></div>
+        <div class="stat-val" id="sPapers">4</div>
+        <div class="stat-lbl">Total Papers Verified</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top"><span>💬</span><span style="color:#34d399;">↑ 18%</span></div>
+        <div class="stat-val" id="sClaims">0</div>
+        <div class="stat-lbl">Total Claims Extracted</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top"><span>🛡️</span><span style="color:#34d399;">↑ 20%</span></div>
+        <div class="stat-val" id="sSupp">0</div>
+        <div class="stat-lbl">Supported Claims</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top"><span>⚠️</span><span style="color:#fbbf24;">↑ 8%</span></div>
+        <div class="stat-val" id="sPart">0</div>
+        <div class="stat-lbl">Partially Supported</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top"><span>✖</span><span style="color:#fb7185;">↑ 10%</span></div>
+        <div class="stat-val" id="sFlag">0</div>
+        <div class="stat-lbl">Unsupported / Flagged</div>
+      </div>
+    </div>
+
+    <section id="view-dashboard">
+      <div class="bottom-grid">
+        <div class="card-box">
+          <div class="card-head">
+            <h3>📊 Claim Verification Overview</h3>
+            <button class="link-sm" type="button" onclick="openView('verifier', 'verifier')">View Details →</button>
+          </div>
+          <div class="donut-wrap">
+            <svg width="126" height="126" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="44" fill="none" stroke="#1e293b" stroke-width="14" />
+              <circle cx="60" cy="60" r="44" fill="none" stroke="#10b981" stroke-width="14" stroke-dasharray="225 276" transform="rotate(-90 60 60)" />
+              <text x="60" y="57" text-anchor="middle" fill="#ffffff" font-size="18" font-weight="800" id="donutScore">0%</text>
+              <text x="60" y="73" text-anchor="middle" fill="#94a3b8" font-size="9">Integrity Score</text>
+            </svg>
+            <div>
+              <div class="legend-row"><span><span class="dot" style="background:#10b981;"></span>Supported</span><strong id="legSupp">0</strong></div>
+              <div class="legend-row"><span><span class="dot" style="background:#f59e0b;"></span>Partially Supported</span><strong id="legPart">0</strong></div>
+              <div class="legend-row"><span><span class="dot" style="background:#f43f5e;"></span>Flagged / Unsupported</span><strong id="legFlag">0</strong></div>
+              <small style="color:var(--muted); font-size:0.7rem;">Quality score ≠ definitive truth</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-box">
+          <div class="card-head">
+            <h3>🛡️ Recent Verification Reports</h3>
+            <button class="link-sm" type="button" onclick="openView('history', 'history')">View All →</button>
+          </div>
+          <div id="recentReportsList"></div>
+        </div>
+      </div>
+
+      <div class="card-box">
+        <div class="card-head">
+          <h3>Audited Claims &amp; Explorer Output</h3>
+          <span style="color:var(--muted); font-size:0.76rem;" id="activeDocLabel">Active Audit</span>
+        </div>
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Claim</th><th>Status</th><th>Strength</th><th>Source</th></tr>
+          </thead>
+          <tbody id="claimsTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="view-verifier" class="hidden">
+      <div class="card-box">
+        <h3>⚡ Instant Claim &amp; Reference Verifier</h3>
+        <label for="inTitle">Audit Title</label>
+        <input id="inTitle" type="text" value="Consciousness Research — CiteVerify Audit" />
+        <label for="inClaim">Scientific Claim</label>
+        <textarea id="inClaim">Integrated Information Theory takes a consciousness-first approach to what exists and models cause-effect structures.</textarea>
+        <label for="inRef">Reference / DOI / Paper Title</label>
+        <input id="inRef" type="text" value="10.48550/arXiv.2510.25998" />
+        <label for="inFile">Upload Research Papers (.pdf, .txt, .md — multiple allowed)</label>
+        <input id="inFile" type="file" accept=".pdf,.txt,.md" multiple onchange="onFileSelected(this)" />
+        <small id="fileStatusText" style="display:block; margin-top:4px; color:#67e8f9;"></small>
+        <label for="inText">Or Paste Paper / Draft Text</label>
+        <textarea id="inText">Integrated Information Theory takes a consciousness-first approach to what exists (Tononi &amp; Boly, 2025). Consciousness corresponds to integrating information across differentiated states (Tononi, 2004). However, exact Phi computation has scalability limitations, and unverified claims [9] need review.</textarea>
+        <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <button class="btn-grad" type="button" id="runVerifyBtn" onclick="runAudit(false)">Run Verification</button>
+          <button class="btn-dark" type="button" onclick="openView('dashboard', 'dashboard')">Back to Dashboard</button>
+          <span id="verifierStatus" style="font-size:0.78rem; color:#67e8f9;"></span>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-conflicts" class="hidden">
+      <div class="card-box">
+        <h3>⚖️ Conflicting Research Detector (Two-Sided View)</h3>
+        <div id="debateContent" style="margin-top:10px;"></div>
+      </div>
+    </section>
+
+    <section id="view-strength" class="hidden">
+      <div class="card-box">
+        <h3>🛡️ Source Reliability &amp; Evidence Strength Analyzer</h3>
+        <div id="strengthContent" style="margin-top:10px;"></div>
+      </div>
+    </section>
+
+    <section id="view-network" class="hidden">
+      <div class="card-box">
+        <h3>📊 Citation Network &amp; Evolution Timeline</h3>
+        <svg id="netSvg" width="100%" height="230" viewBox="0 0 560 230" style="background:#0c1029; border:1px solid var(--border); border-radius:10px;"></svg>
+        <div id="timelineContent" style="margin-top:12px;"></div>
+      </div>
+    </section>
+
+    <section id="view-highlighter" class="hidden">
+      <div class="card-box">
+        <h3>✨ Smart Evidence Highlighter</h3>
+        <div id="highlightContent" style="margin-top:10px;"></div>
+      </div>
+    </section>
+
+    <section id="view-retractions" class="hidden">
+      <div class="card-box">
+        <h3>🧾 Citation &amp; Retraction Discrepancies</h3>
+        <table>
+          <thead><tr><th>Issue Type</th><th>Marker</th><th>Page</th><th>Diagnostic Explanation</th></tr></thead>
+          <tbody id="discTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="view-history" class="hidden">
+      <div class="card-box">
+        <h3>🕒 Verification History</h3>
+        <div id="historyContent"></div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    let isRunning = false;
+    let historyCache = [];
+
+    function onFileSelected(input) {
+      const el = document.getElementById("fileStatusText");
+      if (!el) return;
+      if (input.files && input.files.length > 0) {
+        const files = Array.from(input.files);
+        const totalMb = (files.reduce((acc, f) => acc + f.size, 0) / (1024 * 1024)).toFixed(2);
+        const names = files.map((f) => f.name).join(", ");
+        el.textContent = `Selected (${files.length} paper${files.length > 1 ? "s" : ""}, ${totalMb} MB): ${names} — click Run Verification to process.`;
+      } else {
+        el.textContent = "";
+      }
+    }
+
+    function openView(viewName, navKey = null) {
+      document.querySelectorAll("section[id^='view-']").forEach((s) => s.classList.add("hidden"));
+      const target = document.getElementById(`view-${viewName}`);
+      if (target) target.classList.remove("hidden");
+
+      const activeKey = navKey || viewName;
+      document.querySelectorAll(".side-btn").forEach((b) => {
+        b.classList.toggle("active", b.dataset.nav === activeKey);
+      });
+
+      if (viewName === "history") loadHistory(false);
+    }
+
+    document.querySelectorAll(".side-btn").forEach((b) => {
+      b.addEventListener("click", () => openView(b.dataset.view, b.dataset.nav));
+    });
+
+    function runFromSearch() {
+      const q = document.getElementById("topSearch").value.trim();
+      if (q) document.getElementById("inClaim").value = q;
+      runAudit(false);
+    }
+
+    function renderGraph(net) {
+      const svg = document.getElementById("netSvg");
+      const map = {};
+      (net.nodes || []).forEach((n) => { map[n.id] = n; });
+      let s = `<defs><marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#22d3ee"/></marker></defs>`;
+      (net.edges || []).forEach((e) => {
+        const a = map[e.from], b = map[e.to];
+        if (a && b) s += `<line x1="${a.x}" y1="${a.y * 0.85}" x2="${b.x}" y2="${b.y * 0.85}" stroke="#6366f1" stroke-width="2" marker-end="url(#arr)"/>`;
+      });
+      (net.nodes || []).forEach((n) => {
+        const parts = n.label.split("\n");
+        s += `<g transform="translate(${n.x},${n.y * 0.85})">
+          <rect x="-66" y="-20" width="132" height="40" rx="8" fill="#171e47" stroke="#22d3ee" stroke-width="1.5"/>
+          <text x="0" y="-3" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff">${parts[0]}</text>
+          <text x="0" y="11" text-anchor="middle" font-size="9.5" fill="#22d3ee">${parts[1] || ""}</text>
+        </g>`;
+      });
+      svg.innerHTML = s;
+    }
+
+    function renderAll(d) {
+      document.getElementById("activeDocLabel").textContent = `${d.document_title} • Ref #${d.report_id}`;
+      document.getElementById("donutScore").textContent = `${Math.round(d.integrity_score)}%`;
+      document.getElementById("sClaims").textContent = d.audited_claims;
+      document.getElementById("sSupp").textContent = d.supported_count;
+      document.getElementById("sPart").textContent = d.partial_count;
+      document.getElementById("sFlag").textContent = d.flagged_count;
+
+      document.getElementById("legSupp").textContent = `${d.supported_count} supported`;
+      document.getElementById("legPart").textContent = `${d.partial_count} partial`;
+      document.getElementById("legFlag").textContent = `${d.flagged_count} flagged`;
+
+      document.getElementById("claimsTableBody").innerHTML = (d.claims || []).map((c) => `
+        <tr>
+          <td><strong>${c.id}</strong></td>
+          <td>${c.claim}</td>
+          <td>${c.status}</td>
+          <td>${c.strength_label} (${c.strength_score})</td>
+          <td>${c.source}</td>
+        </tr>
+      `).join("");
+
+      document.getElementById("discTableBody").innerHTML = (d.discrepancies || []).map((x) => `
+        <tr>
+          <td><strong>${x.issue_type}</strong></td>
+          <td>${x.marker}</td>
+          <td>${x.page}</td>
+          <td>${x.explanation}</td>
+        </tr>
+      `).join("");
+
+      document.getElementById("strengthContent").innerHTML =
+        `<p><strong>${d.strength_explorer.label} (${d.strength_explorer.score}/100)</strong></p><ul>` +
+        (d.strength_explorer.factors || []).map((f) => `<li>${f}</li>`).join("") + `</ul>`;
+
+      const sup = (d.debate_explorer.supporting || []).map((p) => `<p><strong>${p.paper}:</strong> ${p.summary}</p>`).join("");
+      const opp = (d.debate_explorer.opposing_or_alternative || []).map((p) => `<p><strong>${p.paper}:</strong> ${p.caveat}</p>`).join("");
+      document.getElementById("debateContent").innerHTML = `<div class="bottom-grid"><div class="card-box"><h4>Supporting</h4>${sup}</div><div class="card-box"><h4>Alternative / Contending</h4>${opp}</div></div>`;
+
+      renderGraph(d.graph_explorer || { nodes: [], edges: [] });
+      document.getElementById("timelineContent").innerHTML = (d.graph_explorer.timeline || [])
+        .map((t) => `<p><strong>${t.year} — ${t.title}:</strong> ${t.detail}</p>`).join("");
+
+      document.getElementById("highlightContent").innerHTML = (d.highlights || [])
+        .map((h) => `<span class="hl hl-${h.tag}">${h.text}</span>`).join(" ");
+    }
+
+    async function runAudit(fromDemo = false) {
+      if (isRunning) return;
+      isRunning = true;
+
+      const banner = document.getElementById("statusBanner");
+      const vStatus = document.getElementById("verifierStatus");
+      const demoBtn = document.getElementById("tryDemoBtn");
+      const verifyBtn = document.getElementById("runVerifyBtn");
+      const fileInput = document.getElementById("inFile");
+      const selectedFiles = (fileInput && fileInput.files) ? Array.from(fileInput.files) : [];
+      const hasFile = selectedFiles.length > 0;
+
+      if (demoBtn) {
+        demoBtn.disabled = true;
+        if (fromDemo) demoBtn.textContent = "Running Demo...";
+      }
+      if (verifyBtn) {
+        verifyBtn.disabled = true;
+        if (!fromDemo) verifyBtn.textContent = hasFile ? "Processing Papers..." : "Verifying...";
+      }
+
+      try {
+        if (fromDemo) {
+          document.getElementById("inTitle").value = "Consciousness Demo — IIT & GWT Audit";
+          document.getElementById("inClaim").value = "Integrated Information Theory takes a consciousness-first approach to what exists and models cause-effect structures.";
+          document.getElementById("inRef").value = "10.48550/arXiv.2510.25998";
+        }
+
+        const msg = fromDemo
+          ? "Running demo audit..."
+          : (hasFile
+              ? `Processing ${selectedFiles.length} paper${selectedFiles.length > 1 ? "s" : ""} & running verification...`
+              : "Running verification...");
+        if (banner) banner.textContent = msg;
+        if (vStatus) vStatus.textContent = msg;
+
+        const fd = new FormData();
+        fd.append("title", document.getElementById("inTitle").value);
+        fd.append("claim", document.getElementById("inClaim").value);
+        fd.append("reference", document.getElementById("inRef").value);
+        fd.append("text", document.getElementById("inText").value);
+        if (hasFile) {
+          fd.append("file", selectedFiles[0]);
+          selectedFiles.forEach((f) => fd.append("files", f));
+        }
+
+        const res = await fetch("/api/analyze", { method: "POST", body: fd });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        renderAll(data);
+        openView("dashboard", "dashboard");
+        await loadHistory(true);
+
+        const doneMsg = `Updated (${data.report_id})`;
+        if (banner) banner.textContent = doneMsg;
+        if (vStatus) vStatus.textContent = doneMsg;
+      } catch (err) {
+        console.error(err);
+        const errMsg = `Error: ${err.message}`;
+        if (banner) banner.textContent = errMsg;
+        if (vStatus) vStatus.textContent = errMsg;
+        alert("Verification failed: " + err.message);
+      } finally {
+        isRunning = false;
+        if (demoBtn) {
+          demoBtn.disabled = false;
+          demoBtn.textContent = "⚡ Try Demo";
+        }
+        if (verifyBtn) {
+          verifyBtn.disabled = false;
+          verifyBtn.textContent = "Run Verification";
+        }
+      }
+    }
+
+    function openHistoryItem(idx) {
+      const item = historyCache[idx];
+      if (!item) return;
+      renderAll(item);
+      openView("dashboard", "dashboard");
+    }
+
+    async function loadHistory(onlyRecent = false) {
+      const res = await fetch("/api/history");
+      if (!res.ok) return;
+      const data = await res.json();
+      const list = data.reports || [];
+      historyCache = list;
+
+      if (list.length) {
+        document.getElementById("recentReportsList").innerHTML = list.slice(0, 3).map((r) => `
+          <div class="report-row">
+            <div><strong>${r.document_title}</strong><small>${r.generated_at} • Integrity ${r.integrity_score}%</small></div>
+            <span class="done-pill">Completed</span>
+          </div>
+        `).join("");
+      }
+      if (!onlyRecent) {
+        document.getElementById("historyContent").innerHTML = list.map((r, idx) => `
+          <div class="report-row">
+            <div><strong>#${r.report_id} — ${r.document_title}</strong><small>${r.generated_at} • ${r.audited_claims} claims • ${r.integrity_score}%</small></div>
+            <button class="btn-dark" type="button" onclick="openHistoryItem(${idx})">Open</button>
+          </div>
+        `).join("") || "<p>No runs yet.</p>";
+      }
+    }
+
+    runAudit(false);
+  </script>
+</body>
+</html>
